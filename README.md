@@ -1,93 +1,107 @@
-# Projet_de_Bachelor
+# Projet de Bachelor: SYN-CNN — Détection d'attaques DDoS par inondation SYN adaptée aux FPGA
 
+Détecteur léger d'attaques DDoS de type **inondation SYN**, conçu pour être embarqué
+sur un **FPGA**. Le trafic réseau est représenté sous forme de fenêtres de paquets et
+classé par un réseau de neurones convolutif (CNN) 1D volontairement compact
+(**2 321 paramètres, ~2,3 Ko** en entiers 8 bits), désigné **SYN-CNN**.
 
+Ce dépôt contient le code source du travail de Bachelor associé.
 
-## Getting started
+## Contexte
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- **Auteur :** Samy Salhaoui
+- **Formation :** Bachelor en Informatique et systèmes de communication (ISC), orientation Sécurité
+- **École :** HEPIA — HES-SO Genève
+- **Encadrant :** Eryk Schiller
+- **Année :** 2026
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Objectif
 
-## Add your files
+Concevoir un modèle d'apprentissage automatique capable de détecter les inondations SYN
+en temps réel, suffisamment compact pour tenir dans la mémoire limitée d'un FPGA, tout en
+minimisant les faux positifs (bloquer un utilisateur légitime étant particulièrement pénalisant).
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## Approche
+
+- Le trafic est découpé en **fenêtres de 24 paquets**, chaque paquet décrit par
+  **4 caractéristiques d'en-tête** : taille, intervalle inter-paquets, protocole, port de destination.
+- Chaque fenêtre (matrice 24 × 4) est classée **bénin / attaque** par un **CNN 1D** :
+  `Conv1D → MaxPool → Conv1D → GlobalAveragePooling → Dense → sigmoïde`.
+- La conception a évolué en trois politiques d'étiquetage successives, la version retenue
+  étiquetant une fenêtre comme « attaque » dès **6 paquets d'attaque sur 24**.
+- Évaluation par **validation croisée stratifiée à 5 plis**.
+
+## Structure du dépôt
 
 ```
-cd existing_repo
-git remote add origin https://gitedu.hesge.ch/samy.salhaoui1/projet_de_bachelor.git
-git branch -M main
-git push -uf origin main
+src/
+├── cnn_ddos_crossval.py        # Entraînement + évaluation en validation croisée 5 plis (matrices de confusion)
+├── cnn_ddos_seuil.py           # Balayage du seuil d'étiquetage des fenêtres (comparaison des performances)
+├── cnn_ddos_tailles.py         # Comparaison de plusieurs tailles de modèle (compact / intermédiaire / grand)
+├── cnn_ddos_generalisation.py  # Première conception : évaluation par découpage par capture (test de généralisation)
+├── diagnostic_faux_positifs.py # Analyse des caractéristiques moyennes des faux positifs
+├── diagnostic_a_cheval.py      # Comptage des paquets d'attaque dans les fenêtres « à cheval »
+└── diagnostic_syn_sources.py   # Diagnostic des sources de trafic SYN
 ```
 
-## Integrate with your tools
+## Prérequis
 
-* [Set up project integrations](https://gitedu.hesge.ch/samy.salhaoui1/projet_de_bachelor/-/settings/integrations)
-
-## Collaborate with your team
-
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+- Python 3.10+
+- Bibliothèques principales : `scapy`, `numpy`, `tensorflow`, `scikit-learn`
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+```bash
+# Cloner le dépôt
+git clone https://githepia.hesge.ch/samy.salhaoui1/projet_de_bachelor.git
+cd projet_de_bachelor
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+# Créer et activer un environnement virtuel
+python -m venv .venv
+source .venv/bin/activate        # Windows : .venv\Scripts\activate
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+# Installer les dépendances
+pip install scapy numpy tensorflow scikit-learn
+```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+## Utilisation
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Les scripts lisent des captures réseau au format **`.pcap`** (via `scapy.PcapReader`).
+Placez vos captures dans le dossier attendu par les scripts (voir le chemin défini en tête
+de chaque fichier) puis exécutez, par exemple :
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+```bash
+# Entraînement et évaluation du modèle retenu (validation croisée)
+python src/cnn_ddos_crossval.py
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+# Étude de l'effet du seuil d'étiquetage
+python src/cnn_ddos_seuil.py
 
-## License
-For open source projects, say how it is licensed.
+# Comparaison des tailles de modèle
+python src/cnn_ddos_tailles.py
+```
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+> **Note :** les captures `.pcap` utilisées (banc d'essai HEPIA) ne sont pas incluses
+> dans ce dépôt en raison de leur volume. Adaptez les chemins d'accès aux données en tête
+> des scripts selon votre environnement.
+
+## Résultats
+
+Avec la configuration retenue (seuil d'étiquetage à 6 paquets), le modèle atteint, en
+validation croisée à 5 plis :
+
+| Métrique   | Valeur |
+|------------|--------|
+| Précision  | 0,987  |
+| Rappel     | 0,998  |
+| F1-score   | 0,993  |
+| Empreinte  | ~2,3 Ko (int8) |
+
+Une comparaison de tailles montre qu'agrandir le réseau (jusqu'à ~15×) n'améliore pas les
+performances, ce qui confirme la pertinence du format compact.
+
+## Avertissement
+
+Projet réalisé dans un cadre académique et évalué sur un banc d'essai dédié (captures
+d'inondation SYN issues de Mirai). Les performances rapportées valent pour ce périmètre
+et ne préjugent pas de la robustesse face à d'autres familles d'attaques DDoS.
