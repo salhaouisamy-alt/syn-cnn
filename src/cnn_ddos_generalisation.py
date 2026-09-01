@@ -30,7 +30,7 @@ NB_CARACTERISTIQUES = 4
 TAILLE, INTERVALLE, PROTOCOLE, PORT = 0, 1, 2, 3
 MAX_FENETRES_PAR_FICHIER = 2000
 
-DOSSIER_PCAP = [r"C:\Users\jojo_\Desktop\data_pcap_bachelor"]
+DOSSIER_PCAP = r"C:\Users\jojo_\Desktop\data_pcap_bachelor"
 
 # Captures NORMALES utilisées pour ENTRAÎNER (le modèle les voit)
 CAPTURES_TRAIN_NORMAL = [
