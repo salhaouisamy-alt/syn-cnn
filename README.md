@@ -101,7 +101,7 @@ validation croisée à 5 plis :
 | F1-score   | 0,993  |
 | Empreinte  | ~2,3 Ko (int8) |
 
-Une comparaison de tailles montre qu'agrandir le réseau (jusqu'à ~15×) n'améliore pas les
+Une comparaison de tailles montre qu'agrandir le réseau (jusqu'à ~15×) n'améliore pas de manière significative les
 performances, ce qui confirme la pertinence du format compact.
 
 ## Avertissement
