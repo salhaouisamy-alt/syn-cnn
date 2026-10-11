@@ -39,6 +39,7 @@ src/
 ├── cnn_ddos_seuil.py           # Balayage du seuil d'étiquetage des fenêtres (comparaison des performances)
 ├── cnn_ddos_tailles.py         # Comparaison de plusieurs tailles de modèle (compact / intermédiaire / grand)
 ├── cnn_ddos_generalisation.py  # Première conception : évaluation par découpage par capture (test de généralisation)
+├── cnn_ddos_quantification.py  # Test de généralisation + quantification int8 (export TFLite pour l'embarqué)
 ├── diagnostic_faux_positifs.py # Analyse des caractéristiques moyennes des faux positifs
 ├── diagnostic_a_cheval.py      # Comptage des paquets d'attaque dans les fenêtres « à cheval »
 └── diagnostic_syn_sources.py   # Diagnostic des sources de trafic SYN
@@ -53,8 +54,8 @@ src/
 
 ```bash
 # Cloner le dépôt
-git clone https://githepia.hesge.ch/samy.salhaoui1/projet_de_bachelor.git
-cd projet_de_bachelor
+git clone https://github.com/salhaouisamy-alt/syn-cnn.git
+cd syn-cnn
 
 # Créer et activer un environnement virtuel
 python -m venv .venv
