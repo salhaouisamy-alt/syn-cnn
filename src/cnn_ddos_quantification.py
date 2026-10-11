@@ -20,13 +20,13 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers, models
 from scapy.all import IP, TCP, UDP, PcapReader
-##shuffle de donnée a voir avec numpy ou skykit
+
 
 # --- Configuration ---
 GRAINE = 42
 NB_PAQUETS = 24
 NB_CARACTERISTIQUES = 4
-TAILLE, INTERVALLE, PROTOCOLE, PORT = 0, 1, 2, 3 #rajouter time stamp
+TAILLE, INTERVALLE, PROTOCOLE, PORT = 0, 1, 2, 3 
 MAX_FENETRES_PAR_FICHIER = 2000
 
 DOSSIER_PCAP = r"C:\Users\jojo_\Desktop/data_pcap_bachelor"   
