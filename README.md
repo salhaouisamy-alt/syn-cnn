@@ -1,7 +1,10 @@
 # Projet de Bachelor: SYN-CNN — Détection d'attaques DDoS par inondation SYN adaptée aux FPGA
 
 Détecteur léger d'attaques DDoS de type **inondation SYN**, conçu pour être embarqué
-sur un **FPGA**. Le trafic réseau est représenté sous forme de fenêtres de paquets et
+sur le **FPGA d'une carte réseau intelligente (SmartNIC)**. Placé ainsi directement au
+niveau du **routeur**, le détecteur analyse le trafic **au plus près du réseau** et permet
+une détection **rapide, à l'entrée**, sans surcharger le processeur du routeur.
+Le trafic réseau est représenté sous forme de fenêtres de paquets et
 classé par un réseau de neurones convolutif (CNN) 1D volontairement compact
 (**2 321 paramètres, ~2,3 Ko** en entiers 8 bits), désigné **SYN-CNN**.
 
